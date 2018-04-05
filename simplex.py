@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Mar 27 10:36:14 2017
-
+x
 @author: Daniel.D
 """
 
 from tkinter import *
 import time
 
-WIDTH = 600
-HEIGHT = 600
+WIDTH = 1000
+HEIGHT = 800
 SIZE = 50
 tk = Tk()
 canvas = Canvas(tk, width=WIDTH, height=HEIGHT, bg="grey")
 canvas.pack()
 
 fen = 6
+
 xmin = -fen
 xmax =  fen
 ymin = -fen
@@ -27,6 +28,7 @@ def xPixel2Domain(x):
     
 def yPixel2Domain(y):
     return y/HEIGHT*(ymax-ymin) + ymin;
+ 
     
 def f(x,y):
     x = xPixel2Domain(x)
@@ -36,8 +38,8 @@ def f(x,y):
 
   
 class Simplex:
-    def __init__(self):
-        self.points = [[150,180,0],[170,180,0],[160,210,0]] 
+    def __init__(self, mouseX,mouseY):
+        self.points = [[mouseX-25,mouseY,0],[mouseX+25,mouseY,0],[mouseX,mouseY+50,0]] 
         self.line1 = canvas.create_line(self.points[0][0], self.points[0][1], self.points[1][0], self.points[1][1])
         self.line2 = canvas.create_line(self.points[0][0], self.points[0][1], self.points[2][0], self.points[2][1])
         self.line3 = canvas.create_line(self.points[1][0], self.points[1][1], self.points[2][0], self.points[2][1])
@@ -53,7 +55,7 @@ class Simplex:
             if self.points[k][2] < bestValue :
                 bestValue = self.points[k][2] 
                 bestIndex = k
-        print("meilleur valeur ", bestValue," pos : (",self.points[bestIndex][0],self.points[bestIndex][0],")"  )
+        print("meilleur valeur ", bestValue," pos : (",xPixel2Domain(self.points[bestIndex][0]),yPixel2Domain(self.points[bestIndex][0]),")"  )
         x1 = self.points[bestIndex][0]-5#for debug
         x2 = self.points[bestIndex][0]+5#for debug
         canvas.create_oval( x1,  self.points[bestIndex][1]-5 , x2, self.points[bestIndex][1]+5, fill="green") #for debug
@@ -140,10 +142,9 @@ class Simplex:
         canvas.create_line(self.points[1][0], self.points[1][1], self.points[2][0], self.points[2][1],fill="blue")
         
         return (x,y)
-    
-        
-simplex = Simplex()
-# i = 0 
+
+simplex = 0
+i = 0 
 # while( i<7 ):
 #     i+=1
 #     print("************  ",i,"   *****************")
@@ -151,33 +152,30 @@ simplex = Simplex()
 #     bID = simplex.findBest()
 #     simplex.moveWorstPoint(wID, bID)
 
-def key(event):
+def key(event): # déplace le simplex
+    global i    
     canvas.focus_set()
-    print( "pressed", repr(event.char))
-    
-def callback(event):
-    canvas.focus_set()
-    print( "clicked at", event.x, event.y)
+    print( "pressed :", i)
+    i+=1
     wID = simplex.findWorst()
     bID = simplex.findBest()
     simplex.moveWorstPoint(wID, bID)
-
+ 
+def callback(event): # créé le simplex
+    global simplex
+    canvas.focus_set()
+    #print( "clicked at", event.x, event.y)
+    simplex = Simplex(event.x, event.y)
 
 canvas.bind("<Key>", key)
-canvas.bind("<Button-1>", callback)
+canvas.bind("<Button-1>", callback )
 canvas.pack()
 
+#tk.after(2000, task)
 tk.mainloop()
 
 
 
-##
-can = Canvas(root, width=100, height=100, bg="grey")
-can.pack()
-
-can.bind("<Key>", key)
-can.bind("<Button-1>", callback)
-can.pack()
 
 
 
